@@ -3,7 +3,7 @@
 export PYTHONPATH := $(shell pwd)
 
 install:
-	poetry install
+	poetry install --no-root
 
 format:
 	poetry run black src
