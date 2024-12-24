@@ -9,12 +9,13 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from src.handler import method_handler
 from src.setup_logs import setup_logging
-from src.settings import Responses
+from src.settings import Responses, store_settings
+from src.store import Store
 
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
     router = {"method": method_handler}
-    store = None
+    store = Store(host=store_settings.host, port=store_settings.port)
 
     def get_request_id(self, headers):
         return headers.get("HTTP_X_REQUEST_ID", uuid.uuid4().hex)
@@ -30,7 +31,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
             logging.exception("Unexpected error: %s" % e)
             code = Responses.BAD_REQUEST
 
-        if request:
+        if request is not None:
             path = self.path.strip("/")
             logging.info("%s: %s %s" % (self.path, data_string, context["request_id"]))
             if path in self.router:
@@ -59,6 +60,28 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(r).encode("utf-8"))
         return
 
+    def do_GET(self):
+        if self.path == "/healthcheck":
+            try:
+                self.store.client.ping()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                response = {"status": "ok", "message": "Server is healthy"}
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                response = {"status": "error", "message": str(e)}
+
+            self.wfile.write(json.dumps(response).encode("utf-8"))
+        else:
+            self.send_response(404)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            response = {"error": "Not Found"}
+            self.wfile.write(json.dumps(response).encode("utf-8"))
+
 
 if __name__ == "__main__":
     setup_logging()
@@ -66,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--port", action="store", type=int, default=8080)
     parser.add_argument("-l", "--log", action="store", default=None)
     args = parser.parse_args()
-    server = HTTPServer(("localhost", args.port), MainHTTPHandler)
+    server = HTTPServer(("0.0.0.0", args.port), MainHTTPHandler)
     logging.info("Starting server at %s" % args.port)
     try:
         server.serve_forever()
