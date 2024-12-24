@@ -13,7 +13,7 @@ typing:
 	poetry run mypy src
 
 test:
-	poetry run python -m unittest -b ./tests/test.py
+	poetry run pytest -v --cov
 
 run:
 	poetry run python ./src/api.py
