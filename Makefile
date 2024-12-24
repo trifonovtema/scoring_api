@@ -1,19 +1,26 @@
-.PHONY: install format typing test run
+.PHONY: install format typing check test run
 
 export PYTHONPATH := $(shell pwd)
 
 install:
-	poetry install
+	poetry install --no-root
 
 format:
 	poetry run black src
 	poetry run flake8 src
+	poetry run black tests
+	poetry run flake8 tests
 
 typing:
 	poetry run mypy src
+	poetry run mypy tests
+
+check:
+	make format
+	make typing
 
 test:
-	poetry run python -m unittest -b ./tests/test.py
+	poetry run pytest -v --cov
 
 run:
 	poetry run python ./src/api.py

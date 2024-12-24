@@ -1,0 +1,2 @@
+class NumberOfRetriesExceeded(Exception):
+    pass

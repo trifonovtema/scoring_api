@@ -7,13 +7,23 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+redis = "^5.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
 black = "^24.10.0"
 flake8 = "^7.1.1"
+pytest-mock = "^3.14.0"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+requests = "^2.32.3"
+types-requests = "^2.32.0.20241016"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_level = "DEBUG"

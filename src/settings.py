@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 
@@ -40,3 +41,12 @@ class GenderSettings:
         MALE: "male",
         FEMALE: "female",
     }
+
+
+@dataclass
+class StoreSettings:
+    host: str = os.environ.get("REDIS_HOST", "localhost")
+    port: int = int(os.environ.get("REDIS_PORT", 6379))
+
+
+store_settings = StoreSettings()

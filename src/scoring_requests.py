@@ -61,6 +61,9 @@ class OnlineScoreRequest(Validatable):
     birthday = BirthDayField(required=False, nullable=True)
     gender = GenderField(required=False, nullable=True)
 
+    def __str__(self):
+        return f"{self.first_name=} {self.last_name=} {self.email=} {self.phone=} {self.birthday=}"
+
 
 class MethodRequest(Validatable):
     account = CharField(required=False, nullable=True)
