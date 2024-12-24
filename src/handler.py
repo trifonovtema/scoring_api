@@ -1,4 +1,8 @@
-from src.requests import MethodRequest, OnlineScoreRequest, ClientsInterestsRequest
+from src.scoring_requests import (
+    MethodRequest,
+    OnlineScoreRequest,
+    ClientsInterestsRequest,
+)
 from src.scoring import get_score, get_interests
 from src.settings import Responses
 
@@ -18,23 +22,23 @@ def method_handler(request, ctx, store):
             Responses.INVALID_REQUEST,
         )
 
-    request = MethodRequest(**body)
-    if not request.check_auth():
+    method_request = MethodRequest(**body)
+    if not method_request.check_auth():
         return Responses.ERRORS[Responses.FORBIDDEN], Responses.FORBIDDEN
 
-    if not request.is_valid():
+    if not method_request.is_valid():
         return (
             Responses.ERRORS[Responses.INVALID_REQUEST]
             + ": "
-            + ", ".join(request.errors),
+            + ", ".join(method_request.errors),
             Responses.INVALID_REQUEST,
         )
 
-    match request.method:
+    match method_request.method:
         case "online_score":
-            return online_score_handler(request, ctx, store)
+            return online_score_handler(method_request, ctx, store)
         case "clients_interests":
-            return clients_interests_handler(request, ctx, store)
+            return clients_interests_handler(method_request, ctx, store)
         case _:
             return (
                 Responses.ERRORS[Responses.INVALID_REQUEST] + ": Wrong method",
@@ -64,7 +68,6 @@ def clients_interests_handler(request: MethodRequest, ctx, store):
 
 def online_score_handler(request: MethodRequest, ctx, store):
     online_score_request = OnlineScoreRequest(**request.arguments)
-
     if not online_score_request.is_valid():
         return (
             Responses.ERRORS[Responses.INVALID_REQUEST]
@@ -91,4 +94,9 @@ def online_score_handler(request: MethodRequest, ctx, store):
     if request.is_admin:
         return {"score": 42}, Responses.OK
 
-    return {"score": get_score(store=store, **request.arguments)}, Responses.OK
+    return {
+        "score": get_score(
+            store=store,
+            online_score_request=online_score_request,
+        )
+    }, Responses.OK
