@@ -1,7 +1,6 @@
 import pytest
 import requests
 from datetime import datetime
-from src.settings import Responses
 from tests.utils import set_valid_auth
 
 

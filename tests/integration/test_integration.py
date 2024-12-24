@@ -1,18 +1,8 @@
-import logging
-import subprocess
-
-import pytest
-from redis import Redis
-from src.store import Store
 from src.handler import method_handler
 from src.settings import Responses
 from datetime import datetime
 import pytest
-import docker
-import time
-from redis import Redis
-import subprocess
-import os
+
 
 from tests.utils import set_valid_auth
 

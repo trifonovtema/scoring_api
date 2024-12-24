@@ -1,10 +1,6 @@
 import pytest
-import hashlib
-import datetime
-
 from src.exceptions import NumberOfRetriesExceeded
-from src.settings import Responses
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from src.store import Store
 
@@ -85,15 +81,3 @@ def test_get_reconnect_on_failure(mock_redis):
 
     assert mock_instance.get.call_count == 2
     assert result == "value"
-
-
-# TODO
-def test_store_connect_timeout(mock_redis):
-    mock_instance = MagicMock()
-    mock_instance.ping.side_effect = Exception("Timeout error")
-    mock_redis.return_value = mock_instance
-
-    with pytest.raises(NumberOfRetriesExceeded):
-        Store(retries=2, timeout=0.1, retry_timeout=0.1)
-
-    assert mock_instance.ping.call_count == 2

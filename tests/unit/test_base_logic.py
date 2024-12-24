@@ -1,10 +1,5 @@
 import pytest
-import hashlib
-import datetime
-
 from src.settings import Responses
-from unittest.mock import MagicMock
-
 from tests.utils import set_valid_auth, get_response
 
 
